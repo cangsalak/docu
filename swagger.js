@@ -87,6 +87,119 @@ const options = {
           },
         },
       },
+      '/pages': {
+        post: {
+          summary: 'สร้างหน้าใหม่',
+          tags: ['Pages'],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    content: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'สร้างหน้าสำเร็จ',
+            },
+          },
+        },
+        get: {
+          summary: 'ดึงรายการหน้าทั้งหมด',
+          tags: ['Pages'],
+          responses: {
+            '200': {
+              description: 'รายการหน้าทั้งหมด',
+            },
+          },
+        },
+      },
+      '/pages/{id}': {
+        get: {
+          summary: 'ดึงข้อมูลหน้าตาม ID',
+          tags: ['Pages'],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'integer' },
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'ข้อมูลหน้า',
+            },
+            '404': {
+              description: 'ไม่พบหน้า',
+            },
+          },
+        },
+        put: {
+          summary: 'อัปเดตหน้า',
+          tags: ['Pages'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'integer' },
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    content: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'อัปเดตหน้าสำเร็จ',
+            },
+            '404': {
+              description: 'ไม่พบหน้า',
+            },
+          },
+        },
+        delete: {
+          summary: 'ลบหน้า',
+          tags: ['Pages'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: { type: 'integer' },
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'ลบหน้าสำเร็จ',
+            },
+            '404': {
+              description: 'ไม่พบหน้า',
+            },
+          },
+        },
+      },
     },
   },
   apis: ['./routes/*.js'],

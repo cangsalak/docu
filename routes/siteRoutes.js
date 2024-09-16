@@ -13,6 +13,7 @@ import { createDepartment, getDepartments, deleteDepartment, updateDepartment } 
 import { getSettings, updateSetting } from '../controllers/settingController.js';
 import adminMiddleware from '../middleware/adminMiddleware.js';
 import loginMiddleware from '../middleware/rateLimiter.js';
+import { createPage, getPages, getPageById, updatePage, deletePage } from '../controllers/pageController.js';
 
 const router = express.Router();
 
@@ -247,7 +248,7 @@ router.post('/blogs', authMiddleware, upload.single('image'), createBlog);
  *                 type: string
  *     responses:
  *       200:
- *         description: อัปเ���ตบล็อกสำเร็จ
+ *         description: อัปเดตบล็อกสำเร็จ
  *       401:
  *         description: ไม่ได้รับอนุญาต
  *       403:
@@ -506,7 +507,7 @@ router.get('/units', authMiddleware, getUnits);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: รายการแ���นก
+ *         description: รายการแผนก
  *       401:
  *         description: ไม่ได้รับอนุญาต
  */
@@ -792,9 +793,6 @@ router.put('/departments/:id', authMiddleware, updateDepartment);
  */
 router.get('/public-documents', getPublicDocuments);
 
-router.get('/settings', authMiddleware, getSettings);
-router.put('/settings/:key', authMiddleware, updateSetting);
-
 /**
  * @swagger
  * /settings:
@@ -854,29 +852,15 @@ router.put('/settings/:key', authMiddleware, updateSetting);
  *         description: ไม่พบการตั้งค่า
  */
 
-
-/**
- * @swagger
- * /settings:
- *   get:
- *     summary: ดึงการตั้งค่าทั้งหมด
- *     tags: [Settings]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: การตั้งค่าทั้งหมด
- *       401:
- *         description: ไม่ได้รับอนุญาต
- */
 router.get('/settings', authMiddleware, getSettings);
+router.put('/settings/:key', authMiddleware, updateSetting);
 
 /**
  * @swagger
- * /settings:
- *   put:
- *     summary: อัปเดตการตั้งค่า
- *     tags: [Settings]
+ * /pages:
+ *   post:
+ *     summary: สร้างหน้าใหม่
+ *     tags: [Pages]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -886,20 +870,192 @@ router.get('/settings', authMiddleware, getSettings);
  *           schema:
  *             type: object
  *             properties:
- *               key:
+ *               title:
  *                 type: string
- *               value:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: สร้างหน้าสำเร็จ
+ *       401:
+ *         description: ไม่ได้รับอนุญาต
+ *   get:
+ *     summary: ดึงรายการหน้าทั้งหมด
+ *     tags: [Pages]
+ *     responses:
+ *       200:
+ *         description: รายการหน้าทั้งหมด
+ */
+router.post('/pages', authMiddleware, createPage);
+router.get('/pages', getPages);
+
+/**
+ * @swagger
+ * /pages/{id}:
+ *   get:
+ *     summary: ดึงข้อมูลหน้าตาม ID
+ *     tags: [Pages]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: ข้อมูลหน้า
+ *       404:
+ *         description: ไม่พบหน้า
+ *   put:
+ *     summary: อัปเดตหน้า
+ *     tags: [Pages]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
  *                 type: string
  *     responses:
  *       200:
- *         description: อัปเดตการตั้งค่าสำเร็จ
+ *         description: อัปเดตหน้าสำเร็จ
  *       401:
  *         description: ไม่ได้รับอนุญาต
- *       403:
- *         description: ไม่มีสิทธิ์อัปเดตการตั้งค่านี้
  *       404:
- *         description: ไม่พบการตั้งค่า
+ *         description: ไม่พบหน้า
+ *   delete:
+ *     summary: ลบหน้า
+ *     tags: [Pages]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: ลบหน้าสำเร็จ
+ *       401:
+ *         description: ไม่ได้รับอนุญาต
+ *       404:
+ *         description: ไม่พบหน้า
  */
-router.put('/settings/:key', authMiddleware, updateSetting);
+
+/**
+ * @swagger
+ * /pages:
+ *   post:
+ *     summary: สร้างหน้าใหม่
+ *     tags: [Pages]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: สร้างหน้าสำเร็จ
+ *       401:
+ *         description: ไม่ได้รับอนุญาต
+ *   get:
+ *     summary: ดึงรายการหน้าทั้งหมด
+ *     tags: [Pages]
+ *     responses:
+ *       200:
+ *         description: รายการหน้าทั้งหมด
+ */
+router.post('/pages', authMiddleware, createPage);
+router.get('/pages', getPages);
+
+/**
+ * @swagger
+ * /pages/{id}:
+ *   get:
+ *     summary: ดึงข้อมูลหน้าตาม ID
+ *     tags: [Pages]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: ข้อมูลหน้า
+ *       404:
+ *         description: ไม่พบหน้า
+ *   put:
+ *     summary: อัปเดตหน้า
+ *     tags: [Pages]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: อัปเดตหน้าสำเร็จ
+ *       401:
+ *         description: ไม่ได้รับอนุญาต
+ *       404:
+ *         description: ไม่พบหน้า
+ *   delete:
+ *     summary: ลบหน้า
+ *     tags: [Pages]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: ลบหน้าสำเร็จ
+ *       401:
+ *         description: ไม่ได้รับอนุญาต
+ *       404:
+ *         description: ไม่พบหน้า
+ */
+router.get('/pages/:id', getPageById);
+router.put('/pages/:id', authMiddleware, updatePage);
+router.delete('/pages/:id', authMiddleware, deletePage);
 
 export default router;

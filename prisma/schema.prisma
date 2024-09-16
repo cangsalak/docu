@@ -141,3 +141,11 @@ model Log {
   metadata  Json?
   createdAt DateTime @default(now())
 }
+
+model Page {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
