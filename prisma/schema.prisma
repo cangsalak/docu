@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  content   String
+  imageUrl  String?
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  comments  Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  username   String    @unique
+  password   String
+  role       Role      @default(GENERAL)
+  department Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  address    String?
+  phoneNumber String?
+  affiliation String?
+  rank       String?
+  position   String?
+  imageUrl   String?
+  documents  Document[]
+  blogs      Blog[]
+  comments   Comment[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  accessLevel Int      @default(1)
+  email      String @unique
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())   // Primary key, auto-increment
+  content   String                                   // เนื้อหาความคิดเห็น
+  author    User     @relation(fields: [authorId], references: [id])  // ความสัมพันธ์กับ User model
+  authorId  Int                                      // Foreign key ที่อ้างอิงไปยัง User
+  blog      Blog     @relation(fields: [blogId], references: [id])    // ความสัมพันธ์กับ Blog model
+  blogId    Int                                      // Foreign key ที่อ้างอิงไปยัง Blog
+  createdAt DateTime @default(now())                 // วันที่สร้างความคิดเห็น
+  updatedAt DateTime @updatedAt                      // วันที่อัปเดตความคิดเห็นล่าสุด
+}
+
+model Document {
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String?
+  filePath        String
+  fileType        String
+  documentType    DocumentType
+  confidentiality Confidentiality
+  documentNumber  String?
+  receivedDate    DateTime?
+  senderUnit      Unit      @relation("SenderUnit", fields: [senderUnitId], references: [id])
+  senderUnitId    Int
+  receiverUnit    Unit      @relation("ReceiverUnit", fields: [receiverUnitId], references: [id])
+  receiverUnitId  Int
+  uploadedBy      User      @relation(fields: [userId], references: [id])
+  userId          Int
+  department      Department @relation(fields: [departmentId], references: [id])
+  departmentId    Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Unit {
+  id              Int       @id @default(autoincrement())
+  name            String
+  address         String
+  phoneNumber     String
+  sentDocuments   Document[] @relation("SenderUnit")
+  receivedDocuments Document[] @relation("ReceiverUnit")
+}
+
+model Department {
+  id        Int       @id @default(autoincrement())
+  name      String
+  documents Document[]
+  users     User[]
+}
+
+model Setting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum DocumentType {
+  INTERNAL
+  EXTERNAL
+  STAMPED
+  COMMAND
+  PUBLICITY
+  EVIDENCE
+}
+
+enum Confidentiality {
+  GENERAL
+  CONFIDENTIAL
+  HIGHLY_CONFIDENTIAL
+  TOP_SECRET
+}
+
+enum Role {
+  GENERAL
+  USER
+  STAFF
+  DEPUTY_DEPARTMENT_HEAD
+  DEPARTMENT_HEAD
+  ASSISTANT_DIRECTOR
+  DEPUTY_DIRECTOR
+  DIRECTOR
+  ADMINISTRATOR
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  level     String
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
